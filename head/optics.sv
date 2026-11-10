@@ -1,19 +1,26 @@
 // The bought parts, as plain solids, for the assembly's picture and its clearance claims: the
-// beamsplitter cube, the two mirrors, the 532 nm filter, the pivot ball (as the gap it sets), and
-// the camera with its lens.  None of these is printed.
+// beamsplitter cube, the two mirrors, the 532 nm filter, the cube's pad, the pivot ball (as the
+// gap it sets), and the camera with its lens.  None of these is printed.
 
 unit mm
 use std
 use std.solids (union)
 use head.prims
-use head.dims (cube, h, mirror_w, mirror_t, mirror_face, carrier_back, kgap, lever, ball,
-               front_out, filter_d, filter_t, board_x, cam_board, cam_ring_d, cam_proud,
+use head.dims (cube, h, pad_t, pad_squeeze, press_w, mirror_w, mirror_t, mirror_face,
+               carrier_back, kgap, lever, ball, front_out, filter_d, filter_t, board_x, cam_board, cam_ring_d, cam_proud,
                cam_behind, lens_len, lens_d)
 
 component Cube() {
   c := head.prims.Block(x0: -cube / 2, x1: cube / 2, y0: -cube / 2, y1: cube / 2,
                         z0: h - cube / 2, z1: h + cube / 2)
   body := solid(c.body)
+}
+
+// the pad between the cube and the lid's post, squeezed
+component Pad() {
+  p := head.prims.Block(x0: -press_w / 2, x1: press_w / 2, y0: -press_w / 2, y1: press_w / 2,
+                        z0: h + cube / 2, z1: h + cube / 2 + pad_t - pad_squeeze)
+  body := solid(p.body)
 }
 
 // mirror A, in the carrier, facing +y; mirror B, on the boss, facing -x

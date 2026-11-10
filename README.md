@@ -20,10 +20,10 @@ make renders   # renders/*.png
 |---|---|
 | `head/dims.sv` | every number, and the optics claims that size the cube, mirrors, window and filter |
 | `head/prims.sv` | boxes, bores along x/y/z, a slot |
-| `head/housing.sv` | the main print: cube pedestal, fixed-mirror boss, adjuster wall, window, filter pocket |
+| `head/housing.sv` | the main print: cube recess, fixed-mirror boss, adjuster wall, window, filter pocket |
 | `head/carrier.sv` | mirror A's tip/tilt carrier |
 | `head/carriage.sv` | the sliding camera plate |
-| `head/lid.sv` | lid with a light-seal lip |
+| `head/lid.sv` | lid with a light-seal lip and the post that holds the cube down |
 | `head/optics.sv` | stand-ins for the bought parts (cube, mirrors, filter, ball, camera + lens) |
 | `head.sv` | the assembly, with clearance claims between parts |
 
@@ -83,6 +83,7 @@ is the pupil. Set `pupil_depth` and `lens_len` (lens plus C–CS spacer) and run
 | 4 | M2.5 × 12 screws | camera to carriage, tapped into the print |
 | 2 | M3 × 10 + washers | carriage to floor |
 | 4 | M3 × 8 | lid |
+| 1 | Silicone or felt pad, 24 × 24 × 2 mm | between the lid's post and the cube; squeezed 0.5 mm |
 | — | RTV silicone | three dots behind each mirror |
 
 Hole sizes for the inserts and taps are in `head/dims.sv` (`m3_insert_d`, `m5_insert_d`,
@@ -107,7 +108,8 @@ Hole sizes for the inserts and taps are in `head/dims.sv` (`m3_insert_d`, `m5_in
 3. **Carrier**: put the ball in the back wall's seat (low, toward the camera). Hook the springs
    through the carrier and the wall onto pins in the grooves, then run the two adjuster screws in
    until they just touch. The springs should pull the carrier onto the ball and both screws.
-4. **Cube**: stand it on the pedestal, pushed against both ledges. Orient the **coated hypotenuse
+4. **Cube**: drop it into the 2 mm recess in the pedestal, which fixes its position and turn.
+   With the lid on, the post presses it down through the pad. Orient the **coated hypotenuse
    from the front-left corner to the back-right corner** seen from above, with the camera on the
    left. To check, cover both mirrors with card: the camera's image should go dark. If it still
    sees the soundboard, it is looking straight off the hypotenuse; turn the cube a quarter turn.
@@ -117,7 +119,9 @@ Hole sizes for the inserts and taps are in `head/dims.sv` (`m3_insert_d`, `m5_in
 6. **Zero shear**: aim at a textured target or the guitar under room light, and turn the two
    adjusters until the doubled image merges into one. Then dial in shear with one screw: the
    lower-right screw seen from behind shears horizontally, the upper-left vertically.
-7. Lid on. Run the ribbon out of the slot low in the left (-x) wall.
+7. Stick the pad on the cube's top (or the lid's post), then screw the lid down: it clamps
+   the cube. The cube only rests in its recess with the lid off, so don't tip the head while
+   aligning. Run the ribbon out of the slot low in the left (-x) wall.
 
 ## Using it for modes
 

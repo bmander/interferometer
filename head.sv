@@ -29,6 +29,7 @@ cube := head.optics.Cube()
 mirror_a := head.optics.MirrorA()
 mirror_b := head.optics.MirrorB()
 filter := head.optics.Filter()
+pad := head.optics.Pad()
 ball := head.optics.Ball()
 camera := head.optics.Camera()
 
@@ -42,6 +43,8 @@ claim camera.body clear(1mm) housing.body
 claim camera.body clear(1mm) lid.body
 claim camera.body clear(2.5mm) cube.body
 claim carriage.body clear(1mm) lid.body
-// the cube sits on its pedestal clear of both mirrors
+// the cube sits in its recess clear of both mirrors, and the lid's post stands the squeezed
+// pad's thickness above it
+claim lid.body clear(1mm) cube.body
 claim cube.body clear(1.5mm) mirror_a.body
 claim cube.body clear(1.5mm) mirror_b.body

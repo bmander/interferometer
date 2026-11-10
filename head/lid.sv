@@ -1,13 +1,14 @@
 // The lid: a plate over the housing's walls, four M3 screws into the inserts in the walls' tops,
-// and a shallow lip just inside the walls so no light leaks round the joint.  The lip breaks
+// a shallow lip just inside the walls so no light leaks round the joint, and a post that
+// presses the beamsplitter cube down into its recess through a pad.  The lip breaks
 // where the fixed mirror's boss stands.  Print it upside down, the lip up.
 
 unit mm
 use std
 use std.solids (union, cut)
 use head.prims
-use head.dims (fit, wall_t, top, lid_t, x_in, side_in, front_in, front_out, back_in, back_out,
-               boss_w, lid_x, m3_clear)
+use head.dims (h, cube, pad_t, pad_squeeze, press_w, fit, wall_t, top, lid_t, x_in, side_in,
+               front_in, front_out, back_in, back_out, boss_w, lid_x, m3_clear)
 
 lip_w := 2mm
 lip_d := 2mm
@@ -33,6 +34,12 @@ component Lid() {
   left.body union body
   right_b.body union body
   right_f.body union body
+
+  // the post that holds the cube down in its recess, through a pad `pad_t` thick squeezed by
+  // `pad_squeeze` as the lid's screws pull it home
+  press := head.prims.Block(x0: -press_w / 2, x1: press_w / 2, y0: -press_w / 2, y1: press_w / 2,
+                            z0: h + cube / 2 + pad_t - pad_squeeze, z1: top + 1mm)
+  press.body union body
 
   repeat lx in lid_x {
     repeat ly in [-(back_in + back_out) / 2, (front_in + front_out) / 2] {

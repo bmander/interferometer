@@ -21,6 +21,7 @@ renders: $(SOURCES)
 	$(SOLVENTC) head.sv --png renders/assembly_top.png --hide lid --view top --size 1100
 	$(SOLVENTC) head.sv --png renders/assembly_section.png --hide lid --section y=0mm --view front --size 1100
 	$(SOLVENTC) head.sv --png renders/assembly_back.png --view 200,20 --size 1100
+	$(SOLVENTC) head.sv --png renders/cube_section_side.png --section x=0mm --view right --size 1100
 
 clean:
 	rm -rf stl

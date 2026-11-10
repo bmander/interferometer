@@ -72,7 +72,7 @@ claim speckle >= 2 * pixel
 // and vignette the field.
 filter_d := 50.8mm         // 2" round bandpass, unmounted
 filter_t := 5mm            // pocket depth: the filter's thickness or a little more
-front_gap := 1mm           // cube's object face to the front wall's inside
+front_gap := 2mm           // cube's object face to the front wall's inside: room for the recess's wall
 front_t := 3mm + filter_t  // the front wall: a 3 mm web behind the filter pocket
 window := cube - 2mm       // the square window through the web
 window_spot := exit_spot + 2 * tan_half * (front_gap + 3mm)
@@ -98,8 +98,18 @@ back_t := 8mm              // the back wall carries the adjusters' inserts
 mirror_face := cube / 2 + gap        // each mirror's surface from the cube's centre
 front_in := cube / 2 + front_gap
 front_out := front_in + front_t
-lip_t := 1.5mm             // the two ledges the cube is pushed against: camera side and front
-lip_h := 0.8mm
+
+// The cube sits in a recess in its pedestal, which fixes it in x, y and its turn, and a padded
+// post under the lid presses it down.  The recess's rim must stay below the light, which leaves
+// the cube's faces no lower than `exit_spot / 2` under the axis.
+recess_d := 2mm
+recess_wall := 1.5mm
+recess_rim := cube / 2 + fit + recess_wall    // the rim's outside, from the cube's centre
+claim (cube - exit_spot) / 2 >= recess_d      // the rim clears the field
+claim cube / 2 + front_gap > recess_rim       // the rim clears the front wall's window
+pad_t := 2mm               // silicone or felt pad under the lid's post
+pad_squeeze := 0.5mm       // how much the lid compresses it
+press_w := 24mm            // the post's square footprint, centred over the cube
 
 // -- mirror A's kinematic carrier --------------------------------------------------------------
 // A pivot ball and two adjuster screws at three corners of a square, `lever` apart; two
@@ -118,6 +128,8 @@ spring_hole := 4mm
 spring_run := 25mm         // each spring this far from the pivot, along an edge: their pull falls inside the three contacts
 groove := 1.6mm            // a slot across each spring hole for a 1.5 mm pin to hook on
 groove_l := 10mm
+carrier_relief := 1.5mm    // a step off the carrier's lower front edge, clear of the recess's rim
+claim mirror_face + carrier_relief - recess_rim >= 1.5mm
 carrier_back := mirror_face + carrier_t
 back_in := carrier_back + kgap      // the back wall's inside, from the cube's centre
 back_out := back_in + back_t
