@@ -1,6 +1,7 @@
 // The housing: one print holding the beamsplitter cube, both mirrors and the camera carriage.
 //
-// A floor with four walls, open at the top for the lid.  On the floor, the cube's pedestal with
+// A floor with four walls, open at the top for the lid, its corners and floor's edges rounded
+// and its walls filleted inside.  On the floor, the cube's pedestal with
 // a shallow recess that fixes the cube square to the world's axes; the lid's padded post holds
 // it down.  The +x wall thickens into a boss whose face carries the fixed mirror B `gap` off
 // the cube.  The back wall is thick: it takes mirror A's pivot ball and the two adjuster screws'
@@ -11,26 +12,26 @@
 unit mm
 use std
 use std.solids (union, cut)
+use std.rounds (round)
 use head.prims
 use head.dims (cube, h, gap, mirror_w, mirror_t, mirror_face, fit, floor_t, wall_t, front_in,
                front_out, back_in, back_out, side_in, x_in, top, recess_d, recess_rim, boss_w, window,
                filter_d, filter_t, lever, seat, seat_deep, spring_hole, spring_run, groove,
                groove_l, m3_insert_d, m3_insert_l, m3_clear, m5_insert_d, m5_insert_l, foot_x,
-               slot_y, lid_x, mount_dx, mount_dy, mount_cx, mount_cy)
+               slot_y, lid_x, mount_dx, mount_dy, mount_cx, mount_cy, corner_r, edge_r,
+               inner_r, fillet)
 
 component Housing() {
   // -- material ---------------------------------------------------------------------------------
-  // Each piece overlaps its neighbours by 1 so no two meet face to face.
-  base := head.prims.Block(x0: x_in - wall_t, x1: side_in + wall_t, y0: -back_out, y1: front_out,
-                           z0: -floor_t, z1: 0mm)
-  wall_l := head.prims.Block(x0: x_in - wall_t, x1: x_in, y0: -back_out, y1: front_out,
-                             z0: -1mm, z1: top)
-  wall_r := head.prims.Block(x0: side_in, x1: side_in + wall_t, y0: -back_out, y1: front_out,
-                             z0: -1mm, z1: top)
-  wall_b := head.prims.Block(x0: x_in - 1mm, x1: side_in + 1mm, y0: -back_out, y1: -back_in,
-                             z0: -1mm, z1: top)
-  wall_f := head.prims.Block(x0: x_in - 1mm, x1: side_in + 1mm, y0: front_in, y1: front_out,
-                             z0: -1mm, z1: top)
+  // One rounded box, its corners `corner_r` in plan and its floor's edges `edge_r`, cut flat at
+  // the walls' top and hollowed by a softer box whose corners leave the walls filleted into
+  // the floor and into one another.
+  shell := head.prims.SoftBox(x0: x_in - wall_t, x1: side_in + wall_t, y0: -back_out, y1: front_out,
+                              z0: -floor_t, z1: top + 2 * corner_r, r: corner_r, e: edge_r)
+  above := head.prims.Block(x0: x_in - wall_t - 1mm, x1: side_in + wall_t + 1mm, y0: -back_out - 1mm,
+                            y1: front_out + 1mm, z0: top, z1: top + 3 * corner_r)
+  cavity := head.prims.SoftBox(x0: x_in, x1: side_in, y0: -back_in, y1: front_in, z0: 0mm,
+                               z1: top + 2 * corner_r, r: inner_r, e: fillet)
   // the cube stands in a recess in the pedestal, `recess_d` deep, its bottom face `h - cube / 2`
   // up; the pedestal runs on into the fixed mirror's boss and the front wall
   pedestal := head.prims.Block(x0: -recess_rim, x1: mirror_face + 1mm, y0: -recess_rim,
@@ -39,13 +40,17 @@ component Housing() {
   boss := head.prims.Block(x0: mirror_face, x1: side_in + 1mm, y0: -boss_w / 2, y1: boss_w / 2,
                            z0: -1mm, z1: top)
 
-  body := solid(base.body)
-  wall_l.body union body
-  wall_r.body union body
-  wall_b.body union body
-  wall_f.body union body
+  // the walls are a solid of their own, hollowed before the pedestal and boss join them: a
+  // body's unions come before its cuts
+  walls := solid(shell.body)
+  above.body cut walls
+  cavity.body cut walls
+  body := solid(walls)
   pedestal.body union body
   boss.body union body
+  // the boss's two front corners, rounded
+  body.boss.body.da round(r: 2mm) body.boss.body.ab
+  body.boss.body.da round(r: 2mm) body.boss.body.cd
 
   recess := head.prims.Block(x0: -cube / 2 - fit, x1: cube / 2 + fit, y0: -cube / 2 - fit,
                              y1: cube / 2 + fit, z0: h - cube / 2, z1: h - cube / 2 + recess_d + 1mm)

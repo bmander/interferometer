@@ -44,11 +44,11 @@ pupil_depth := 12mm
 
 // -- the interferometer ------------------------------------------------------------------------
 n_glass := 1.519           // N-BK7 at 532 nm
-cube := 40mm               // non-polarizing 50:50 beamsplitter cube, VIS coated
+cube := 40mm               // 50:50 cube beamsplitter, VIS (Edmund #32-506); never a polarizing one
 cube_ca := 0.9 * cube      // clear aperture: the coating's usable 90%
 gap := 2mm                 // cube face to each mirror's surface: both arms the same
-mirror_w := 30mm           // square first-surface mirrors (round would need 30 mm across the corners anyway)
-mirror_t := 3mm
+mirror_w := 30mm           // square first-surface mirrors, Edmund #63-165 (round would need 30 mm across the corners)
+mirror_t := 5mm            // Edmund #63-165 (check the thickness of yours)
 mirror_ca := 0.9 * mirror_w
 lens_gap := 3mm            // the lens's front rim to the cube's camera face
 
@@ -85,7 +85,6 @@ fit := 0.2mm               // clearance per side on every pocket that takes a bo
 m3_insert_d := 4.0mm       // heat-set inserts: hole diameter and depth
 m3_insert_l := 6mm
 m3_clear := 3.4mm
-m3_head_d := 6.2mm
 m25_tap_d := 2.2mm         // M2.5 screws tapped straight into the print
 m5_insert_d := 6.4mm
 m5_insert_l := 6.5mm
@@ -117,7 +116,7 @@ press_w := 24mm            // the post's square footprint, centred over the cube
 // toward the camera, the horizontal-shear screw low and away from it, the vertical-shear screw
 // above the pivot.
 carrier_w := 50mm
-carrier_t := 8mm
+carrier_t := 10mm          // 5 behind the mirror's pocket
 lever := 38mm
 ball := 4mm                // steel ball at the pivot, in a seat in each face
 seat := 3.2mm
@@ -148,25 +147,65 @@ cam_behind := 14.72mm
 cam_tab := 6.49mm          // the ribbon connector's drop below the board
 lens_len := 35mm           // lens plus its C–CS spacer: measure yours, the carriage slides ±travel
 lens_d := 34mm
-travel := 12mm
+travel := 9mm             // either way: lenses from 26 to 44 mm long
 plate_t := 6mm
 plate_w := 40mm
-foot_l := 22mm
+foot_l := 27mm             // in front of the plate
 foot_t := 6mm
 rib_t := 3mm
 rib_h := 18mm
 slot_y := 12mm             // the foot's two slots, either side of the axis
 board_x := -(cube / 2 + lens_gap + lens_len + cam_proud)   // the flange face, at nominal travel
-foot_x := board_x + plate_t + foot_l / 2                    // the foot's centre: floor inserts here
+// The floor inserts, under the slots' middles.  Each slot runs `travel` either way of its
+// insert: no nearer the plate than its screw's washer allows, and 3 short of the foot's end.
+slot_lo := plate_t + washer_d / 2 + 0.5mm                  // the slots' range, from the plate's back face
+slot_hi := plate_t + foot_l - 3mm - m3_clear / 2
+foot_x := board_x + (slot_lo + slot_hi) / 2
+claim (slot_hi - slot_lo) / 2 >= travel
+// slid all the way forward, for the shortest lens, the foot stops short of the cube's pedestal
+claim board_x + travel + plate_t + foot_l <= -recess_rim - 2mm
 
 // -- the housing's extent ------------------------------------------------------------------
 side_in := carrier_w / 2 + 5mm                             // the +x wall's inside
 x_in := board_x - travel - cam_behind - 8mm                // the -x wall's inside: room for the ribbon's fold
-top := max(h + carrier_w / 2, h + cam_board / 2, h + lens_d / 2) + 3mm
+top := max(h + carrier_w / 2, h + cam_board / 2, h + lens_d / 2) + 4mm
 lid_t := 4mm
+// The finish: the box's corners rounded in plan, its floor's and the lid's outer edges rounded,
+// the walls filleted into the floor inside, and a lip under the lid that drops into the walls.
+corner_r := 8mm            // the box's corners, in plan
+edge_r := 2mm              // the floor's outside edges and the lid's top edges
+inner_r := corner_r - wall_t    // the cavity's corners: an even wall round them
+fillet := 1.5mm            // the walls into the floor, inside
+lip_d := 3mm               // the lid's locating lip: its depth into the walls
+lip_w := 2mm
+lip_lead := 1mm            // its lower outside edge rounded, to lead it in
+lid_x := [x_in - wall_t + corner_r, side_in + wall_t - corner_r]   // lid screws: on the corners' centres
 boss_w := mirror_w + 6mm                                   // the fixed mirror's boss, across y
-lid_x := [x_in + 5mm, side_in]                             // lid screws: near each end wall
 mount_dx := 100mm          // M5 inserts underneath, on this rectangle, for the T-slot frame
 mount_dy := 40mm
 mount_cx := (x_in + side_in) / 2
 mount_cy := (front_out - back_out) / 2
+
+// -- hardware ----------------------------------------------------------------------------------
+// The bought fasteners, sized as the parts expect them (`head.hardware` draws them).
+cap_head_d := 5.5mm        // M3 socket-head cap screw
+cap_head_h := 3mm
+adj_len := 16mm            // the adjusters: M3 × 16, tip on the carrier's back face
+claim adj_len - back_t - kgap >= 3mm      // the head stands off the wall: room to turn it in
+pin_d := 1.5mm             // the spring pins, lying in their grooves
+// Mirror A's springs: McMaster-Carr 5108N95, music wire with loop ends, 12.5 mm long inside the
+// loops, 3.5 mm OD on 0.5 mm wire, 0.46 lb (2.05 N) to start it and 0.33 lbf/mm (1.47 N/mm) after,
+// 19.4 mm at its maximum load.  `head.sv` claims each sits within that range on its pins.
+spring_len := 12.5mm
+spring_max := 19.4mm
+spring_f0 := 2.05N
+spring_k := 1.47N / 1mm
+spring_r := 1.5mm          // coil radius to the wire's centre: 3.5 OD in a Ø4 hole
+spring_wire := 0.25mm      // wire radius
+spring_turns := 12
+lid_screw_len := 8mm       // M3 × 8 into the walls' inserts
+cart_screw_len := 10mm     // M3 × 10 with a washer, through the carriage's slots
+washer_d := 7mm
+washer_t := 0.5mm
+m25_len := 12mm            // M2.5 × 12 from behind the camera into the carriage
+cam_stack := 6.2mm         // what those screws pass through first: the mount's flange and the board (check yours)

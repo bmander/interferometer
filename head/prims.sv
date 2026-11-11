@@ -2,6 +2,10 @@
 // axis, and a slot.  Each is a closed figure of numbers (1.8), drawn about its own frame's
 // datums, so two calls with the same numbers are one figure placed twice.
 //
+// `RoundBox` rounds a box's edges along z; `SoftBox` rounds every edge, those along z by `r` and
+// the rest by `e`, by growing a smaller `RoundBox` by `e` (`std.rounds.Grown`).  Cut from a
+// part, a `SoftBox` leaves its inside corners filleted.
+//
 // The views and their normals: `std.top` (u x, v y) sweeps along +z; `std.side` (u y, v z) along
 // +x; `std.front` (u x, v z) along -y, so a front sweep's ordinates are -y.
 
@@ -9,6 +13,7 @@ unit mm
 use std
 use std.place (coords)
 use std.solids (union)
+use std.rounds
 
 // The box [x0, x1] × [y0, y1] × [z0, z1]: its outline walked counter-clockwise as four runs,
 // each a signed ordinate from the top's origin, so every corner has one place and no seed.
@@ -18,6 +23,28 @@ component Block(x0: Length, x1: Length, y0: Length, y1: Length, z0: Length, z1: 
             step(u: x0) (cd := line) -> step(v: y0) (da := line) -> close
   }
   body := solid(std.solids.Prism(loop, from: z0, to: z1))
+}
+
+// The box with its four edges along z rounded `r`: two crossed boxes and a post at each corner.
+component RoundBox(x0: Length, x1: Length, y0: Length, y1: Length, z0: Length, z1: Length,
+                   r: Length) {
+  a := Block(x0: x0 + r, x1: x1 - r, y0: y0, y1: y1, z0: z0, z1: z1)
+  b := Block(x0: x0, x1: x1, y0: y0 + r, y1: y1 - r, z0: z0, z1: z1)
+  body := solid(a.body)
+  b.body union body
+  repeat q in [(x0 + r, y0 + r), (x1 - r, y0 + r), (x1 - r, y1 - r), (x0 + r, y1 - r)] {
+    post := BoreZ(x: q.x, y: q.y, d: 2 * r, z0: z0, z1: z1)
+    post.body union body
+  }
+}
+
+// The box with every edge rounded: those along z by `r`, the rest by `e` (`e < r`).
+component SoftBox(x0: Length, x1: Length, y0: Length, y1: Length, z0: Length, z1: Length,
+                  r: Length, e: Length) {
+  core := RoundBox(x0: x0 + e, x1: x1 - e, y0: y0 + e, y1: y1 - e, z0: z0 + e, z1: z1 - e, r: r - e)
+  grown := std.rounds.Grown(core.body, d: e)
+  body := solid(grown.body)
+  core.body union body       // inside already: this only spends the core, so it is no part of its own
 }
 
 // A round bore of diameter `d` along z, at (x, y), from z0 to z1.

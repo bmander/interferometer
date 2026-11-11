@@ -10,6 +10,7 @@
 unit mm
 use std
 use std.solids (union, cut)
+use std.rounds (round)
 use head.prims
 use head.dims (h, fit, cube, recess_d, carrier_relief, mirror_w, mirror_t, mirror_face, carrier_w,
                carrier_back, lever, seat, seat_deep, spring_hole, spring_run, groove, groove_l)
@@ -20,6 +21,11 @@ component Carrier() {
   plate := head.prims.Block(x0: -carrier_w / 2, x1: carrier_w / 2, y0: y_b, y1: y_f,
                             z0: h - carrier_w / 2, z1: h + carrier_w / 2)
   body := solid(plate.body)
+  // its four corners, seen from the cube, rounded
+  body.plate.body.near round(r: 4mm) body.plate.body.bc
+  body.plate.body.near round(r: 4mm) body.plate.body.da
+  body.plate.body.far round(r: 4mm) body.plate.body.bc
+  body.plate.body.far round(r: 4mm) body.plate.body.da
 
   // a step off the lower front edge, where it stands over the rim of the cube's recess
   relief_top := h - cube / 2 + recess_d + 1.5mm
