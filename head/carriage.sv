@@ -14,7 +14,7 @@ use std.solids (union, cut)
 use std.rounds (round)
 use head.prims
 use head.dims (h, fit, board_x, plate_t, plate_w, foot_l, foot_t, rib_t, rib_h, foot_x, travel,
-               slot_y, cam_ring_d, cam_hole, m25_tap_d, m3_clear)
+               slot_y, cam_ring_d, cam_hole, m25_tap_d, m3_clear, foot_fillet)
 
 component Carriage() {
   plate := head.prims.Block(x0: board_x, x1: board_x + plate_t, y0: -plate_w / 2, y1: plate_w / 2,
@@ -31,12 +31,14 @@ component Carriage() {
                             z0: 0mm, z1: rib_h)
     rib.body union body
   }
-  // fillets where the ribs and the foot stand on one another and on the plate, and the
-  // plate's top corners rounded
+  // fillets where the foot and the ribs stand on the plate and the ribs on the foot (the
+  // foot's fillet stops flush either side of each slot), and the plate's top corners rounded
+  body.foot round(r: foot_fillet) body.plate
   body.rib round(r: 1mm) body.foot
   body.rib round(r: 2mm) body.plate
-  body.plate.body.near round(r: 4mm) body.plate.body.ab
-  body.plate.body.near round(r: 4mm) body.plate.body.cd
+  repeat f in [body.plate.body.ab, body.plate.body.cd] {
+    body.plate.body.near round(r: 4mm) f
+  }
 
   bore := head.prims.BoreX(y: 0mm, z: h, d: cam_ring_d + 2 * fit, x0: board_x - 1mm,
                            x1: board_x + plate_t + 1mm)

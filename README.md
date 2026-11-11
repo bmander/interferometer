@@ -1,7 +1,7 @@
 # Shearography head for guitar soundboard modal analysis
 
 A Michelson shearing interferometer in front of a Raspberry Pi Global Shutter Camera (IMX296),
-modelled in [Solvent](https://github.com/bmander/geomsolver) and checked with `solventc` v0.1.16.
+modelled in [Solvent](https://github.com/bmander/geomsolver) and checked with `solventc` v0.1.17.
 The head images a **500 mm square** of soundboard from about **1.07 m** through a 40 mm
 beamsplitter cube, lit by a 532 nm laser. It bolts to your T-slot frame through four M5 inserts in
 its floor.
@@ -148,11 +148,12 @@ Hole sizes for the inserts and taps are in `head/dims.sv` (`m3_insert_d`, `m5_in
   pocket's arc overhangs near its top, so use supports there or print the pocket shallower.
 - **Carrier**: face (mirror pocket) down. **Carriage**: standing on its foot. **Lid**: upside down,
   lip up.
-- **The finish.** The box's corners are rounded 8 mm in plan. The housing's floor edges and the
-  lid's top edges are rounded 2 mm. Both of those edges sit on the bed, so the first layer is
-  inset a little; a brim helps if they curl. Inside, the walls are filleted 1.5 mm into the floor
-  and 4 mm into one another. The carrier's corners and the carriage plate's top corners are
-  rounded 4 mm, and the carriage's ribs are filleted into its foot and plate.
+- **The finish.** The box's corners are rounded 8 mm in plan. The housing's floor edge is
+  chamfered 1.5 mm all round, which prints cleanly on the bed and hides elephant's foot. The lid's
+  top edges are rounded 2 mm; they sit on the bed too, so the first layer is inset a little and a
+  brim helps if they curl. Inside, the walls are filleted 1.5 mm into the floor and 4 mm into one
+  another. The carrier's corners and the carriage plate's top corners are rounded 4 mm. The
+  carriage's foot and ribs are filleted into its plate, and the ribs into the foot.
 - Use high infill (≥ 60%) and ≥ 4 perimeters. Rigidity and mass damp vibration, which matters
   because the head sits near a speaker-driven guitar.
 

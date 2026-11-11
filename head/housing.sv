@@ -1,7 +1,7 @@
 // The housing: one print holding the beamsplitter cube, both mirrors and the camera carriage.
 //
-// A floor with four walls, open at the top for the lid, its corners and floor's edges rounded
-// and its walls filleted inside.  On the floor, the cube's pedestal with
+// A floor with four walls, open at the top for the lid, its corners rounded, its floor's edge
+// chamfered and its walls filleted inside.  On the floor, the cube's pedestal with
 // a shallow recess that fixes the cube square to the world's axes; the lid's padded post holds
 // it down.  The +x wall thickens into a boss whose face carries the fixed mirror B `gap` off
 // the cube.  The back wall is thick: it takes mirror A's pivot ball and the two adjuster screws'
@@ -12,24 +12,22 @@
 unit mm
 use std
 use std.solids (union, cut)
-use std.rounds (round)
+use std.rounds (round, chamfer)
 use head.prims
 use head.dims (cube, h, gap, mirror_w, mirror_t, mirror_face, fit, floor_t, wall_t, front_in,
                front_out, back_in, back_out, side_in, x_in, top, recess_d, recess_rim, boss_w, window,
                filter_d, filter_t, lever, seat, seat_deep, spring_hole, spring_run, groove,
                groove_l, m3_insert_d, m3_insert_l, m3_clear, m5_insert_d, m5_insert_l, foot_x,
-               slot_y, lid_x, mount_dx, mount_dy, mount_cx, mount_cy, corner_r, edge_r,
+               slot_y, lid_x, mount_dx, mount_dy, mount_cx, mount_cy, corner_r, base_chamfer,
                inner_r, fillet)
 
 component Housing() {
   // -- material ---------------------------------------------------------------------------------
-  // One rounded box, its corners `corner_r` in plan and its floor's edges `edge_r`, cut flat at
-  // the walls' top and hollowed by a softer box whose corners leave the walls filleted into
-  // the floor and into one another.
-  shell := head.prims.SoftBox(x0: x_in - wall_t, x1: side_in + wall_t, y0: -back_out, y1: front_out,
-                              z0: -floor_t, z1: top + 2 * corner_r, r: corner_r, e: edge_r)
-  above := head.prims.Block(x0: x_in - wall_t - 1mm, x1: side_in + wall_t + 1mm, y0: -back_out - 1mm,
-                            y1: front_out + 1mm, z0: top, z1: top + 3 * corner_r)
+  // One box, its corners rounded `corner_r` in plan and its floor's edge chamfered all round
+  // (the edge it prints on), hollowed by a soft box whose corners leave the walls filleted
+  // into the floor and into one another.
+  shell := head.prims.Block(x0: x_in - wall_t, x1: side_in + wall_t, y0: -back_out, y1: front_out,
+                            z0: -floor_t, z1: top)
   cavity := head.prims.SoftBox(x0: x_in, x1: side_in, y0: -back_in, y1: front_in, z0: 0mm,
                                z1: top + 2 * corner_r, r: inner_r, e: fillet)
   // the cube stands in a recess in the pedestal, `recess_d` deep, its bottom face `h - cube / 2`
@@ -42,8 +40,11 @@ component Housing() {
 
   // the walls are a solid of their own, hollowed before the pedestal and boss join them: a
   // body's unions come before its cuts
-  walls := solid(shell.body)
-  above.body cut walls
+  box := solid(shell.body)
+  repeat f in box.shell { repeat g in box.shell {
+    when f parallel std.z and g parallel std.z and f != g { f round(r: corner_r) g } } }
+  walls := solid(box)        // the box as its corners leave it, so the chamfer runs round them
+  walls.box.shell.body.far chamfer(d: base_chamfer) walls.box
   cavity.body cut walls
   body := solid(walls)
   pedestal.body union body

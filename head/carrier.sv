@@ -22,10 +22,11 @@ component Carrier() {
                             z0: h - carrier_w / 2, z1: h + carrier_w / 2)
   body := solid(plate.body)
   // its four corners, seen from the cube, rounded
-  body.plate.body.near round(r: 4mm) body.plate.body.bc
-  body.plate.body.near round(r: 4mm) body.plate.body.da
-  body.plate.body.far round(r: 4mm) body.plate.body.bc
-  body.plate.body.far round(r: 4mm) body.plate.body.da
+  repeat e in [body.plate.body.near, body.plate.body.far] {
+    repeat f in [body.plate.body.bc, body.plate.body.da] {
+      e round(r: 4mm) f
+    }
+  }
 
   // a step off the lower front edge, where it stands over the rim of the cube's recess
   relief_top := h - cube / 2 + recess_d + 1.5mm

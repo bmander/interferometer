@@ -150,15 +150,16 @@ lens_d := 34mm
 travel := 9mm             // either way: lenses from 26 to 44 mm long
 plate_t := 6mm
 plate_w := 40mm
-foot_l := 27mm             // in front of the plate
+foot_l := 29mm             // in front of the plate
+foot_fillet := 2mm         // where the foot meets the plate
 foot_t := 6mm
 rib_t := 3mm
 rib_h := 18mm
 slot_y := 12mm             // the foot's two slots, either side of the axis
 board_x := -(cube / 2 + lens_gap + lens_len + cam_proud)   // the flange face, at nominal travel
 // The floor inserts, under the slots' middles.  Each slot runs `travel` either way of its
-// insert: no nearer the plate than its screw's washer allows, and 3 short of the foot's end.
-slot_lo := plate_t + washer_d / 2 + 0.5mm                  // the slots' range, from the plate's back face
+// insert: its screw's washer clear of the plate's fillet, and 3 short of the foot's end.
+slot_lo := plate_t + foot_fillet + washer_d / 2 + 0.5mm                  // the slots' range, from the plate's back face
 slot_hi := plate_t + foot_l - 3mm - m3_clear / 2
 foot_x := board_x + (slot_lo + slot_hi) / 2
 claim (slot_hi - slot_lo) / 2 >= travel
@@ -170,10 +171,11 @@ side_in := carrier_w / 2 + 5mm                             // the +x wall's insi
 x_in := board_x - travel - cam_behind - 8mm                // the -x wall's inside: room for the ribbon's fold
 top := max(h + carrier_w / 2, h + cam_board / 2, h + lens_d / 2) + 4mm
 lid_t := 4mm
-// The finish: the box's corners rounded in plan, its floor's and the lid's outer edges rounded,
+// The finish: the box's corners rounded in plan, its floor's edge chamfered, the lid's rounded,
 // the walls filleted into the floor inside, and a lip under the lid that drops into the walls.
 corner_r := 8mm            // the box's corners, in plan
-edge_r := 2mm              // the floor's outside edges and the lid's top edges
+edge_r := 2mm              // the lid's top edges
+base_chamfer := 1.5mm      // the housing's floor edge, on the print bed
 inner_r := corner_r - wall_t    // the cavity's corners: an even wall round them
 fillet := 1.5mm            // the walls into the floor, inside
 lip_d := 3mm               // the lid's locating lip: its depth into the walls
